@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namaz Times Checker</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
+        input, button { margin: 10px; padding: 10px; font-size: 16px; }
+        button { background: aqua; border: none; cursor: pointer; color: black; }
+        .result { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Namaz Times Checker</h1>
+    <input id="city" placeholder="Enter city" />
+    <button onclick="getNamazTimes()">Check Times</button>
+    <div id="result" class="result"></div>
+
+    <script>
+        const getNamazTimes = async () => {
+            const city = document.getElementById('city').value.trim();
+            if (!city) return alert("Please enter a city!");
+
+            try {
+                const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Pakistan&method=2`);
+                const data = await res.json();
+                const { Fajr, Dhuhr, Asr, Maghrib, Isha } = data.data.timings;
+                document.getElementById('result').innerHTML = `
+                    <h3>Namaz Times for ${city}</h3>
+                    <p>Fajr: ${Fajr}</p>
+                    <p>Dhuhr: ${Dhuhr}</p>
+                    <p>Asr: ${Asr}</p>
+                    <p>Maghrib: ${Maghrib}</p>
+                    <p>Isha: ${Isha}</p>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p>Error fetching data. Please try again.</p>`;
+            }
+        };
+    </script>
+</body>
+</html>

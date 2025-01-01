@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namaz Times & Weather Checker</title>
+    <style>
+        body {  text-align: center; }
+        input, button { margin: 10px; padding: 6px; font-size: 16px; }
+        button { background: aqua;  cursor: pointer; }
+        .result {   max-width: 300px; margin: 0 auto;   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h1>Check Namaz Time <br><br> And Weather Checker</h1>
+
+    <div>
+        <input id="city" placeholder="Enter city" />
+        <button onclick="getNamazTimes()">Get Namaz Times</button>
+        <div id="namaz-result" class="result"></div>
+    </div>
+
+    <div>
+        <input id="weather-city" placeholder="Enter city for weather" />
+        <button onclick="getWeather()">Check Weather</button>
+        <div id="weather-result" class="result"></div>
+    </div>
+
+    <script>
+        const getNamazTimes = async () => {
+            const city = document.getElementById('city').value.trim();
+            if (!city) return alert("Enter a city for Namaz Times!");
+
+            try {
+                const res = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=Pakistan&method=2`);
+                const data = await res.json();
+                const timings = data.data.timings;
+                document.getElementById('namaz-result').innerHTML = `
+                    <h3>Namaz Times for ${city}</h3>
+                    <p>Fajr: ${timings.Fajr}</p>
+                    <p>Dhuhr: ${timings.Dhuhr}</p>
+                    <p>Asr: ${timings.Asr}</p>
+                    <p>Maghrib: ${timings.Maghrib}</p>
+                    <p>Isha: ${timings.Isha}</p>
+                `;
+            } catch (error) {
+                document.getElementById('namaz-result').innerHTML = `<p>Error fetching Namaz times!</p>`;
+            }
+        };
+
+        const getWeather = async () => {
+            const city = document.getElementById('weather-city').value.trim();
+            if (!city) return alert("Enter a city for Weather!");
+
+            try {
+                const res = await fetch(`https://api.weatherapi.com/v1/current.json?key=d347dfb1a00b4f86add45435242510&q=${city}`);
+                const data = await res.json();
+                const { temp_c, condition } = data.current;
+                document.getElementById('weather-result').innerHTML = `
+                    <h3>Weather in ${data.location.name}</h3>
+                    <p>Temperature: ${temp_c}°C</p>
+                    <p>Condition: ${condition.text}</p>
+                    <img src="${condition.icon}" alt="Weather Icon">
+                `;
+            } catch (error) {
+                document.getElementById('weather-result').innerHTML = `<p>Error fetching weather!</p>`;
+            }
+        };
+    </script>
+
+</body>
+</html>
